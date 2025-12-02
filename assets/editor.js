@@ -8,10 +8,22 @@
 	 */
 	function getFileNameFromUrl(url) {
 		if (!url || typeof url !== 'string') return '';
+
+		// URL から最後の / 以降を取得
 		const parts = url.split('/');
 		const fileName = parts[parts.length - 1];
-		const nameWithoutExt = fileName.split('.').slice(0, -1).join('.');
-		return nameWithoutExt || fileName;
+
+		// クエリパラメータを除去
+		const fileNameWithoutQuery = fileName.split('?')[0];
+
+		// 拡張子を除去
+		const dotIndex = fileNameWithoutQuery.lastIndexOf('.');
+		if (dotIndex > 0) {
+			return fileNameWithoutQuery.substring(0, dotIndex);
+		}
+
+		// 拡張子がない場合はそのまま返す
+		return fileNameWithoutQuery;
 	}
 
 	/**
