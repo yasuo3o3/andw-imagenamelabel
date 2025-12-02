@@ -33,11 +33,21 @@
 	 */
 	function getExtensionFromUrl(url) {
 		if (!url || typeof url !== 'string') return '';
-		const parts = url.split('.');
-		if (parts.length < 2) return '';
-		const ext = parts[parts.length - 1].toLowerCase();
+
+		// URL から最後の / 以降を取得
+		const parts = url.split('/');
+		const fileName = parts[parts.length - 1];
+
 		// クエリパラメータを除去
-		return ext.split('?')[0];
+		const fileNameWithoutQuery = fileName.split('?')[0];
+
+		// 最後の . 以降を取得
+		const dotIndex = fileNameWithoutQuery.lastIndexOf('.');
+		if (dotIndex > 0 && dotIndex < fileNameWithoutQuery.length - 1) {
+			return fileNameWithoutQuery.substring(dotIndex + 1).toLowerCase();
+		}
+
+		return '';
 	}
 
 	/**
@@ -68,32 +78,38 @@
 						let displayName = '';
 						let ext = '';
 
+						// デバッグ用ログ
+						console.log('[andW ImageNameLabel] attributes:', attributes);
+
 						// 1. alt があれば alt を使用
 						if (attributes.alt && typeof attributes.alt === 'string' && attributes.alt.trim() !== '') {
 							displayName = attributes.alt.trim();
 							if (attributes.url) {
 								ext = getExtensionFromUrl(attributes.url);
 							}
+							console.log('[andW ImageNameLabel] Using alt:', displayName, 'ext:', ext);
 						}
 						// 2. alt が空なら URL からファイル名取得
 						else if (attributes.url && typeof attributes.url === 'string') {
 							displayName = getFileNameFromUrl(attributes.url);
 							ext = getExtensionFromUrl(attributes.url);
+							console.log('[andW ImageNameLabel] Using filename from URL:', displayName, 'ext:', ext);
 						}
 
 						// ファイル名が取得できない場合はデフォルトラベルを返す
 						if (!displayName) {
+							console.log('[andW ImageNameLabel] No display name, using default');
 							return settings.title || 'Image';
 						}
 
 						// 3. 13文字以上なら短縮（前6...後6）
 						displayName = truncateFileName(displayName);
+						console.log('[andW ImageNameLabel] After truncate:', displayName);
 
 						// 4. 「画像 <名前> [ 拡張子 ]」形式で返す
-						if (ext) {
-							return '画像 <' + displayName + '> [ ' + ext.toUpperCase() + ' ]';
-						}
-						return '画像 <' + displayName + '>';
+						const label = ext ? '画像 <' + displayName + '> [ ' + ext.toUpperCase() + ' ]' : '画像 <' + displayName + '>';
+						console.log('[andW ImageNameLabel] Final label:', label);
+						return label;
 					}
 
 					// その他のコンテキストではデフォルトのタイトルを返す

@@ -4,7 +4,7 @@ Tags: block editor, image, list view, gutenberg
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 0.0.5
+Stable tag: 0.0.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,10 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 すべての画像形式に対応しています。拡張子は大文字で「画像 <ファイル名> [ PNG ]」のように表示されます。
 
 == Changelog ==
+
+= 0.0.6 =
+* getExtensionFromUrl 関数も修正（URL全体ではなくファイル名から拡張子を抽出）
+* デバッグ用コンソールログを追加
 
 = 0.0.5 =
 * getFileNameFromUrl 関数のバグ修正（ファイル名が空になる問題を解決）
