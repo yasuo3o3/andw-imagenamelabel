@@ -73,8 +73,13 @@
 
 			return Object.assign({}, settings, {
 				__experimentalLabel: function(attributes, context) {
+					console.log('[DEBUG] __experimentalLabel called');
+					console.log('[DEBUG] context:', context);
+					console.log('[DEBUG] attributes:', attributes);
+
 					// list-view コンテキストの場合のみカスタムラベルを返す
 					if (context && context.context === 'list-view') {
+						console.log('[DEBUG] list-view context detected');
 						let displayName = '';
 						let ext = '';
 
@@ -84,28 +89,37 @@
 							if (attributes.url) {
 								ext = getExtensionFromUrl(attributes.url);
 							}
+							console.log('[DEBUG] Using alt:', displayName, 'ext:', ext);
 						}
 						// 2. alt が空なら URL からファイル名取得
 						else if (attributes.url && typeof attributes.url === 'string') {
 							displayName = getFileNameFromUrl(attributes.url);
 							ext = getExtensionFromUrl(attributes.url);
+							console.log('[DEBUG] Using filename:', displayName, 'ext:', ext);
 						}
 
 						// ファイル名が取得できない場合はデフォルトラベルを返す
 						if (!displayName) {
+							console.log('[DEBUG] No displayName, returning default');
 							return settings.title || 'Image';
 						}
 
 						// 3. 13文字以上なら短縮（前6...後6）
 						displayName = truncateFileName(displayName);
+						console.log('[DEBUG] After truncate:', displayName);
 
 						// 4. 「画像 <名前> [ 拡張子 ]」形式で返す
+						let finalLabel;
 						if (ext) {
-							return '画像 <' + displayName + '> [ ' + ext.toUpperCase() + ' ]';
+							finalLabel = '画像 <' + displayName + '> [ ' + ext.toUpperCase() + ' ]';
+						} else {
+							finalLabel = '画像 <' + displayName + '>';
 						}
-						return '画像 <' + displayName + '>';
+						console.log('[DEBUG] Final label:', finalLabel);
+						return finalLabel;
 					}
 
+					console.log('[DEBUG] Not list-view context, returning default');
 					// その他のコンテキストではデフォルトのタイトルを返す
 					return settings.title || 'Image';
 				}
