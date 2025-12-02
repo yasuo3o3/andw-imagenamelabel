@@ -1,6 +1,5 @@
 (function() {
 	const { addFilter } = wp.hooks;
-	const { createElement } = wp.element;
 
 	/**
 	 * URL からファイル名（拡張子除く）を取得
@@ -40,73 +39,56 @@
 	}
 
 	/**
-	 * 拡張子に応じた CSS クラスを返す
-	 * @param {string} ext - 拡張子
-	 * @return {string} CSS クラス名
-	 */
-	function getMimeClass(ext) {
-		if (ext === 'png') return 'andw-mime-png';
-		if (ext === 'jpg' || ext === 'jpeg') return 'andw-mime-jpg';
-		return 'andw-mime-other';
-	}
-
-	/**
-	 * BlockListBlock のラベルをフックして差し替え
+	 * core/image ブロックに __experimentalLabel を追加
 	 */
 	addFilter(
-		'editor.BlockListBlock',
-		'andw-imagenamelabel/custom-label',
-		function(BlockListBlock) {
-			return function(props) {
-				// core/image 以外はスルー
-				if (!props.block || props.block.name !== 'core/image') {
-					return createElement(BlockListBlock, props);
-				}
+		'blocks.registerBlockType',
+		'andw-imagenamelabel/add-label',
+		function(settings, name) {
+			if (name !== 'core/image') {
+				return settings;
+			}
 
-				const attributes = props.block.attributes || {};
+			return Object.assign({}, settings, {
+				__experimentalLabel: function(attributes, context) {
+					// list-view コンテキストの場合のみカスタムラベルを返す
+					if (context && context.context === 'list-view') {
+						let displayName = '';
+						let ext = '';
 
-				let displayName = '';
-				let ext = '';
+						// 1. alt があれば alt を使用
+						if (attributes.alt && typeof attributes.alt === 'string' && attributes.alt.trim() !== '') {
+							displayName = attributes.alt.trim();
+							if (attributes.url) {
+								ext = getExtensionFromUrl(attributes.url);
+							}
+						}
+						// 2. alt が空なら URL からファイル名取得
+						else if (attributes.url && typeof attributes.url === 'string') {
+							displayName = getFileNameFromUrl(attributes.url);
+							ext = getExtensionFromUrl(attributes.url);
+						}
 
-				// 1. alt があれば alt を使用
-				if (attributes.alt && typeof attributes.alt === 'string' && attributes.alt.trim() !== '') {
-					displayName = attributes.alt.trim();
-					// alt の場合も拡張子取得は URL から
-					if (attributes.url) {
-						ext = getExtensionFromUrl(attributes.url);
+						// ファイル名が取得できない場合はデフォルトラベルを返す
+						if (!displayName) {
+							return settings.title || 'Image';
+						}
+
+						// 3. 9文字以上なら短縮
+						displayName = truncateFileName(displayName);
+
+						// 4. 拡張子を含めた文字列を返す
+						// ※ list-view では HTML要素ではなく文字列を返す必要がある
+						if (ext) {
+							return displayName + ' [' + ext.toUpperCase() + ']';
+						}
+						return displayName;
 					}
+
+					// その他のコンテキストではデフォルトのタイトルを返す
+					return settings.title || 'Image';
 				}
-				// 2. alt が空なら URL からファイル名取得
-				else if (attributes.url && typeof attributes.url === 'string') {
-					displayName = getFileNameFromUrl(attributes.url);
-					ext = getExtensionFromUrl(attributes.url);
-				}
-
-				// ファイル名が取得できない場合は元の BlockListBlock を返す
-				if (!displayName) {
-					return createElement(BlockListBlock, props);
-				}
-
-				// 3. 9文字以上なら短縮
-				displayName = truncateFileName(displayName);
-
-				// 4. span 要素を生成
-				const className = 'andw-image-name-label ' + getMimeClass(ext);
-
-				const customLabel = createElement(
-					'span',
-					{
-						className: className
-					},
-					displayName
-				);
-
-				// BlockListBlock に customLabel を渡す
-				return createElement(BlockListBlock, {
-					...props,
-					label: customLabel
-				});
-			};
+			});
 		}
 	);
 })();
