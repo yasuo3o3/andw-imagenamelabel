@@ -4,7 +4,7 @@ Tags: block editor, image, list view, gutenberg
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 0.0.3
+Stable tag: 0.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,8 +18,8 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 * alt テキストが設定されている場合は alt を表示
 * alt が空の場合は URL からファイル名（拡張子除く）を取得して表示
-* 9文字以上のファイル名は自動で短縮（先頭4文字 + "..." + 末尾4文字）
-* 拡張子を大文字で表示（例: [PNG], [JPG]）
+* 13文字以上のファイル名は自動で短縮（先頭6文字 + "..." + 末尾6文字）
+* 表示形式: 「画像 <ファイル名> [ 拡張子 ]」（拡張子の前後にスペース）
 
 **特徴:**
 
@@ -41,9 +41,15 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 = 対応している画像形式は？ =
 
-すべての画像形式に対応しています。拡張子は大文字で [PNG], [JPG] のように表示されます。
+すべての画像形式に対応しています。拡張子は大文字で「画像 <ファイル名> [ PNG ]」のように表示されます。
 
 == Changelog ==
+
+= 0.0.4 =
+* ラベル表示フォーマットを「画像 <ファイル名> [ 拡張子 ]」に変更
+* ファイル名短縮を前後6文字に拡大（前後4文字から変更）
+* 拡張子表示の前後にスペースを追加
+* 「画像」という文字をラベルに含めるように変更
 
 = 0.0.3 =
 * __experimentalLabel を使用した正しい実装に変更

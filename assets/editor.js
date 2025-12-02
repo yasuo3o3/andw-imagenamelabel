@@ -29,13 +29,13 @@
 	}
 
 	/**
-	 * 9文字以上なら短縮（先頭4 + "..." + 末尾4）
+	 * 13文字以上なら短縮（先頭6 + "..." + 末尾6）
 	 * @param {string} str - 対象文字列
 	 * @return {string} 短縮後の文字列
 	 */
 	function truncateFileName(str) {
-		if (!str || str.length <= 8) return str;
-		return str.slice(0, 4) + '...' + str.slice(-4);
+		if (!str || str.length <= 12) return str;
+		return str.slice(0, 6) + '...' + str.slice(-6);
 	}
 
 	/**
@@ -74,15 +74,14 @@
 							return settings.title || 'Image';
 						}
 
-						// 3. 9文字以上なら短縮
+						// 3. 13文字以上なら短縮（前6...後6）
 						displayName = truncateFileName(displayName);
 
-						// 4. 拡張子を含めた文字列を返す
-						// ※ list-view では HTML要素ではなく文字列を返す必要がある
+						// 4. 「画像 <名前> [ 拡張子 ]」形式で返す
 						if (ext) {
-							return displayName + ' [' + ext.toUpperCase() + ']';
+							return '画像 <' + displayName + '> [ ' + ext.toUpperCase() + ' ]';
 						}
-						return displayName;
+						return '画像 <' + displayName + '>';
 					}
 
 					// その他のコンテキストではデフォルトのタイトルを返す
