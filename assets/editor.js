@@ -54,54 +54,59 @@
 	 * BlockListBlock のラベルをフックして差し替え
 	 */
 	addFilter(
-		'blocks.getBlockLabel',
+		'editor.BlockListBlock',
 		'andw-imagenamelabel/custom-label',
-		function(label, blockType, attributes) {
-			// core/image 以外はスルー
-			if (!blockType || blockType.name !== 'core/image') {
-				return label;
-			}
+		function(BlockListBlock) {
+			return function(props) {
+				// core/image 以外はスルー
+				if (!props.block || props.block.name !== 'core/image') {
+					return createElement(BlockListBlock, props);
+				}
 
-			// 属性存在確認
-			if (!attributes) {
-				return label;
-			}
+				const attributes = props.block.attributes || {};
 
-			let displayName = '';
-			let ext = '';
+				let displayName = '';
+				let ext = '';
 
-			// 1. alt があれば alt を使用
-			if (attributes.alt && typeof attributes.alt === 'string' && attributes.alt.trim() !== '') {
-				displayName = attributes.alt.trim();
-				// alt の場合も拡張子取得は URL から
-				if (attributes.url) {
+				// 1. alt があれば alt を使用
+				if (attributes.alt && typeof attributes.alt === 'string' && attributes.alt.trim() !== '') {
+					displayName = attributes.alt.trim();
+					// alt の場合も拡張子取得は URL から
+					if (attributes.url) {
+						ext = getExtensionFromUrl(attributes.url);
+					}
+				}
+				// 2. alt が空なら URL からファイル名取得
+				else if (attributes.url && typeof attributes.url === 'string') {
+					displayName = getFileNameFromUrl(attributes.url);
 					ext = getExtensionFromUrl(attributes.url);
 				}
-			}
-			// 2. alt が空なら URL からファイル名取得
-			else if (attributes.url && typeof attributes.url === 'string') {
-				displayName = getFileNameFromUrl(attributes.url);
-				ext = getExtensionFromUrl(attributes.url);
-			}
 
-			// ファイル名が取得できない場合は元のラベルを返す
-			if (!displayName) {
-				return label;
-			}
+				// ファイル名が取得できない場合は元の BlockListBlock を返す
+				if (!displayName) {
+					return createElement(BlockListBlock, props);
+				}
 
-			// 3. 9文字以上なら短縮
-			displayName = truncateFileName(displayName);
+				// 3. 9文字以上なら短縮
+				displayName = truncateFileName(displayName);
 
-			// 4. span 要素を生成
-			const className = 'andw-image-name-label ' + getMimeClass(ext);
+				// 4. span 要素を生成
+				const className = 'andw-image-name-label ' + getMimeClass(ext);
 
-			return createElement(
-				'span',
-				{
-					className: className
-				},
-				displayName
-			);
+				const customLabel = createElement(
+					'span',
+					{
+						className: className
+					},
+					displayName
+				);
+
+				// BlockListBlock に customLabel を渡す
+				return createElement(BlockListBlock, {
+					...props,
+					label: customLabel
+				});
+			};
 		}
 	);
 })();

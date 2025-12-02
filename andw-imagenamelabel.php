@@ -2,7 +2,7 @@
 /**
  * Plugin Name: andW ImageNameLabel
  * Description: ブロックエディタのリストビューで core/image ブロックのラベルを画像名で差し替える
- * Version: 0.0.1
+ * Version: 0.0.2
  * Author: yasuo3o3
  * Author URI: https://yasuo-o.xyz/
  * License: GPLv2 or later
@@ -23,8 +23,8 @@ function andw_imagenamelabel_enqueue_editor_assets() {
 	wp_enqueue_script(
 		'andw-imagenamelabel-editor',
 		plugin_dir_url( __FILE__ ) . 'assets/editor.js',
-		array( 'wp-blocks', 'wp-element', 'wp-hooks', 'wp-components' ),
-		'0.0.1',
+		array( 'wp-blocks', 'wp-element', 'wp-hooks', 'wp-components', 'wp-block-editor' ),
+		'0.0.2',
 		true
 	);
 
@@ -33,7 +33,7 @@ function andw_imagenamelabel_enqueue_editor_assets() {
 		'andw-imagenamelabel-editor',
 		plugin_dir_url( __FILE__ ) . 'assets/editor.css',
 		array(),
-		'0.0.1'
+		'0.0.2'
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'andw_imagenamelabel_enqueue_editor_assets' );

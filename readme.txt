@@ -4,7 +4,7 @@ Tags: block editor, image, list view, gutenberg
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 0.0.1
+Stable tag: 0.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,11 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 すべての画像形式に対応していますが、色分け表示は PNG（緑）、JPG/JPEG（青）、その他（グレー）となります。
 
 == Changelog ==
+
+= 0.0.2 =
+* フィルターを editor.BlockListBlock に修正（blocks.getBlockLabel は無関係だった）
+* wp-block-editor 依存を追加
+* リストビューでのラベル差し替えが正しく動作するように修正
 
 = 0.0.1 =
 * 初回リリース
