@@ -1,0 +1,50 @@
+=== andW ImageNameLabel ===
+Contributors: yasuo3o3
+Tags: block editor, image, list view, gutenberg
+Requires at least: 6.0
+Tested up to: 6.7
+Requires PHP: 7.4
+Stable tag: 0.0.1
+License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+
+ブロックエディタのリストビューで core/image ブロックのラベルを画像名で差し替える。
+
+== Description ==
+
+ブロックエディタのリストビューにおいて、core/image ブロックのラベルを画像の alt テキストまたはファイル名で差し替えます。
+
+**主な機能:**
+
+* alt テキストが設定されている場合は alt を表示
+* alt が空の場合は URL からファイル名（拡張子除く）を取得して表示
+* 9文字以上のファイル名は自動で短縮（先頭4文字 + "..." + 末尾4文字）
+* 拡張子に応じた色分け表示（PNG: 緑、JPG: 青、その他: グレー）
+
+**特徴:**
+
+* ビルド不要の軽量実装（PHP + 素の JavaScript）
+* エディタ画面のみで動作（フロントエンドには影響なし）
+* WordPress コーディング規約準拠
+
+== Installation ==
+
+1. プラグインファイルを `/wp-content/plugins/andw-imagenamelabel/` ディレクトリにアップロード
+2. WordPress の「プラグイン」メニューからプラグインを有効化
+3. ブロックエディタでリストビューを開き、画像ブロックのラベルが変更されていることを確認
+
+== Frequently Asked Questions ==
+
+= フロントエンドに影響はありますか？ =
+
+いいえ、このプラグインはエディタ画面のみで動作し、フロントエンドには一切影響しません。
+
+= 対応している画像形式は？ =
+
+すべての画像形式に対応していますが、色分け表示は PNG（緑）、JPG/JPEG（青）、その他（グレー）となります。
+
+== Changelog ==
+
+= 0.0.1 =
+* 初回リリース
+* リストビューで core/image ブロックのラベルを画像名で差し替え機能を実装
