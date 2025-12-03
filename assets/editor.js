@@ -110,10 +110,13 @@
 		const ext = getExtensionFromUrl(url);
 		console.log('[andW ImageNameLabel] extension:', ext);
 
-		// 「画像 <名前> [ 拡張子 ]」形式で返す
-		const finalLabel = ext
-			? '画像 <' + truncated + '> [ ' + ext.toUpperCase() + ' ]'
-			: '画像 <' + truncated + '>';
+		// 「画像 ファイル名 [拡張子]」形式で返す（山括弧を使わない）
+		// WordPress 6.5+ の stripHTML() で削除されないようプレーンテキストのみ使用
+		const parts = ['画像', truncated];
+		if (ext) {
+			parts.push('[' + ext.toUpperCase() + ']');
+		}
+		const finalLabel = parts.join(' ');
 		console.log('[andW ImageNameLabel] final label:', finalLabel);
 
 		return finalLabel;
