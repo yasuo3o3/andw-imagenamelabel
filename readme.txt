@@ -4,7 +4,7 @@ Tags: block editor, image, list view, gutenberg
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.7
+Stable tag: 1.0.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,12 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 すべての画像形式に対応しています。拡張子を含めたファイル名全体が「画像 mongol-cow.png」のように表示されます。
 
 == Changelog ==
+
+= 1.0.8 =
+* [Major] editor.BlockNavigationBlock フィルターを追加（WordPress 6.3+ の List View 対応）
+* [Major] WordPress.org 規約に準拠しつつ全バージョン（6.0-6.9）対応を実現
+* [Info] wp-element を依存関係に追加
+* [Info] 公開 API のみ使用（__experimentalLabel 不使用）
 
 = 1.0.7 =
 * [Major] __experimentalLabel の使用を削除（WordPress.org 規約準拠）

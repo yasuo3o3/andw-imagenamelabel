@@ -1,6 +1,7 @@
 (function() {
 	const { addFilter } = wp.hooks;
 	const { sprintf, __ } = wp.i18n;
+	const { createElement } = wp.element;
 
 	/**
 	 * URL からファイル名（拡張子含む）を取得
@@ -133,6 +134,7 @@
 	/**
 	 * blocks.getBlockLabel フィルター
 	 * WordPress 6.0+ で使用可能な安定 API
+	 * List View 以外のコンテキスト（インスペクター、置換ダイアログ等）で使用
 	 */
 	addFilter(
 		'blocks.getBlockLabel',
@@ -144,6 +146,38 @@
 
 			const customLabel = generateLabel(attributes);
 			return customLabel || label;
+		}
+	);
+
+	/**
+	 * editor.BlockNavigationBlock フィルター
+	 * WordPress 6.3+ の List View で使用可能な公開 API
+	 * props.title を上書きしてラベルをカスタマイズ
+	 */
+	addFilter(
+		'editor.BlockNavigationBlock',
+		'andw-imagenamelabel/list-view-label',
+		function(BlockNavigationBlock) {
+			return function(props) {
+				// core/image 以外はそのまま返す
+				if (props.block?.name !== 'core/image') {
+					return createElement(BlockNavigationBlock, props);
+				}
+
+				// カスタムラベルを生成
+				const customLabel = generateLabel(props.block.attributes || {});
+
+				// ラベルが生成できない場合はデフォルト
+				if (!customLabel) {
+					return createElement(BlockNavigationBlock, props);
+				}
+
+				// props.title を上書きしてコンポーネントを返す
+				return createElement(BlockNavigationBlock, {
+					...props,
+					title: customLabel
+				});
+			};
 		}
 	);
 })();

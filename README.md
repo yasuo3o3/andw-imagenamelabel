@@ -74,6 +74,12 @@ WordPress 6.0 以降で動作します。WordPress 6.9 まで動作確認済み�
 
 ## 変更履歴
 
+### 1.0.8
+- **[Major] editor.BlockNavigationBlock フィルターを追加**: WordPress 6.3+ の List View 対応
+- **[Major] WordPress.org 規約に準拠**: 全バージョン（6.0-6.9）対応を実現
+- **[Info] wp-element を依存関係に追加**
+- **[Info] 公開 API のみ使用**: `__experimentalLabel` 不使用
+
 ### 1.0.7
 - **[Major] __experimentalLabel の使用を削除**: WordPress.org 規約準拠
 - **[Major] blocks.getBlockLabel のみを使用**: 安定 API 実装に変更
