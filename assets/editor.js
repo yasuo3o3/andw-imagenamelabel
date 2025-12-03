@@ -1,6 +1,7 @@
 (function() {
 	const { addFilter } = wp.hooks;
 	const { sprintf, __ } = wp.i18n;
+	const { createElement } = wp.element;
 
 	/**
 	 * URL からファイル名（拡張子含む）を取得
@@ -145,6 +146,51 @@
 
 			const customLabel = generateLabel(attributes);
 			return customLabel || label;
+		}
+	);
+
+	/**
+	 * editor.BlockNavigationBlock フィルター
+	 * WordPress 6.3+ の List View 専用
+	 * props.block.attributes から直接ラベルを生成して block を書き換える
+	 */
+	addFilter(
+		'editor.BlockNavigationBlock',
+		'andw-imagenamelabel/list-view-label',
+		function(BlockNavigationBlock) {
+			return function(props) {
+				// core/image 以外はそのまま返す
+				if (props.block?.name !== 'core/image') {
+					return createElement(BlockNavigationBlock, props);
+				}
+
+				// props.block.attributes から直接ラベルを生成
+				const customLabel = generateLabel(props.block.attributes || {});
+
+				// ラベルが生成できない場合はデフォルト
+				if (!customLabel) {
+					return createElement(BlockNavigationBlock, props);
+				}
+
+				// 重要: props.title ではなく props.block を書き換える
+				// BlockNavigationBlock は内部で props.block からラベルを計算する
+				const modifiedBlock = {
+					...props.block,
+					// カスタムラベルを block のメタ情報として注入
+					attributes: {
+						...props.block.attributes,
+						// WordPress が認識する形でラベル情報を追加
+						// alt が空の場合はカスタムラベルを alt として注入
+						alt: props.block.attributes?.alt || customLabel
+					}
+				};
+
+				// 書き換えた block で BlockNavigationBlock をレンダリング
+				return createElement(BlockNavigationBlock, {
+					...props,
+					block: modifiedBlock
+				});
+			};
 		}
 	);
 })();
