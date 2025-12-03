@@ -1,6 +1,7 @@
 <?php
 /**
  * Plugin Name: andW ImageNameLabel
+ * Plugin URI: https://github.com/yasuo3o3/andw-imagenamelabel
  * Description: ブロックエディタのリストビューで core/image ブロックのラベルを画像名で差し替える
  * Version: 1.0.8
  * Author: yasuo3o3
