@@ -23,7 +23,7 @@ function andw_imagenamelabel_enqueue_editor_assets() {
 	wp_enqueue_script(
 		'andw-imagenamelabel-editor',
 		plugin_dir_url( __FILE__ ) . 'assets/editor.js',
-		array( 'wp-blocks', 'wp-hooks', 'wp-i18n', 'wp-element' ),
+		array( 'wp-blocks', 'wp-hooks', 'wp-i18n' ),
 		'1.0.8',
 		true
 	);
