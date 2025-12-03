@@ -91,23 +91,32 @@
 	 * @return {string} 生成されたラベル（空の場合は空文字列）
 	 */
 	function generateLabel(attributes) {
+		console.log('[andW ImageNameLabel] generateLabel called', { attributes });
+
 		const displayName = buildLabel(attributes);
+		console.log('[andW ImageNameLabel] displayName:', displayName);
+
 		if (!displayName) {
+			console.log('[andW ImageNameLabel] displayName is empty, returning empty string');
 			return '';
 		}
 
 		// 13文字以上なら短縮
 		const truncated = truncateFileName(displayName);
+		console.log('[andW ImageNameLabel] truncated:', truncated);
 
 		// 拡張子を取得
 		const url = (attributes && attributes.url) || '';
 		const ext = getExtensionFromUrl(url);
+		console.log('[andW ImageNameLabel] extension:', ext);
 
 		// 「画像 <名前> [ 拡張子 ]」形式で返す
-		if (ext) {
-			return '画像 <' + truncated + '> [ ' + ext.toUpperCase() + ' ]';
-		}
-		return '画像 <' + truncated + '>';
+		const finalLabel = ext
+			? '画像 <' + truncated + '> [ ' + ext.toUpperCase() + ' ]'
+			: '画像 <' + truncated + '>';
+		console.log('[andW ImageNameLabel] final label:', finalLabel);
+
+		return finalLabel;
 	}
 
 	/**
@@ -117,14 +126,19 @@
 		'blocks.registerBlockType',
 		'andw-imagenamelabel/add-label',
 		function(settings, name) {
+			console.log('[andW ImageNameLabel] registerBlockType filter called for:', name);
+
 			if (name !== 'core/image') {
 				return settings;
 			}
 
 			const originalLabel = settings.__experimentalLabel;
+			console.log('[andW ImageNameLabel] Original __experimentalLabel:', typeof originalLabel);
 
 			return Object.assign({}, settings, {
 				__experimentalLabel: function(attributes, context) {
+					console.log('[andW ImageNameLabel] __experimentalLabel called', { attributes, context });
+
 					// context 形式の汎用判定
 					// WP 6.0-6.3: { context: 'list-view' }（オブジェクト）
 					// WP 6.4-6.7: 'list-view'（文字列の場合もある）
@@ -134,8 +148,11 @@
 							? context
 							: (context && (context.context || context.name)) || '';
 
+					console.log('[andW ImageNameLabel] contextName:', contextName);
+
 					if (contextName !== 'list-view') {
 						// list-view 以外のコンテキストでは元のラベルを返す
+						console.log('[andW ImageNameLabel] Not list-view context, returning original');
 						return originalLabel
 							? originalLabel(attributes, context)
 							: settings.title || 'Image';
@@ -145,11 +162,13 @@
 					const label = generateLabel(attributes);
 					if (!label) {
 						// ラベルが生成できない場合は元のラベルを返す
+						console.log('[andW ImageNameLabel] Label generation failed, returning original');
 						return originalLabel
 							? originalLabel(attributes, context)
 							: settings.title || 'Image';
 					}
 
+					console.log('[andW ImageNameLabel] Returning custom label:', label);
 					return label;
 				}
 			});
@@ -163,12 +182,17 @@
 		'blocks.getBlockLabel',
 		'andw-imagenamelabel/get-block-label',
 		function(label, blockType, attributes) {
+			console.log('[andW ImageNameLabel] getBlockLabel called', { label, blockType, attributes });
+
 			if (!blockType || blockType.name !== 'core/image') {
 				return label;
 			}
 
+			console.log('[andW ImageNameLabel] getBlockLabel for core/image');
+
 			// カスタムラベル生成
 			const customLabel = generateLabel(attributes);
+			console.log('[andW ImageNameLabel] getBlockLabel returning:', customLabel || label);
 			return customLabel || label;
 		}
 	);
