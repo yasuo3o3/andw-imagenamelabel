@@ -1,11 +1,11 @@
 {
   "translation-revision-date": "2025-01-15 00:00+0900",
   "generator": "Manual",
-  "domain": "messages",
+  "domain": "andw-imagenamelabel",
   "locale_data": {
-    "messages": {
+    "andw-imagenamelabel": {
       "": {
-        "domain": "messages",
+        "domain": "andw-imagenamelabel",
         "lang": "ja",
         "plural-forms": "nplurals=1; plural=0;"
       },
