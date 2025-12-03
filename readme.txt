@@ -4,7 +4,7 @@ Tags: block editor, image, list view, gutenberg
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -17,9 +17,9 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 **主な機能:**
 
 * alt テキストが設定されている場合は alt を表示
-* alt が空の場合は URL からファイル名（拡張子除く）を取得して表示
-* 13文字以上のファイル名は自動で短縮（先頭6文字 + "..." + 末尾6文字）
-* 表示形式: 「画像 ファイル名 [拡張子]」（プレーンテキストのみ）
+* alt が空の場合は URL からファイル名（拡張子含む）を取得して表示
+* 18文字以上のファイル名は自動で短縮（先頭6文字 + "..." + 末尾6文字 + 拡張子）
+* 表示形式: 「画像 ファイル名.拡張子」（プレーンテキストのみ）
 
 **特徴:**
 
@@ -41,9 +41,14 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 = 対応している画像形式は？ =
 
-すべての画像形式に対応しています。拡張子は大文字で「画像 ファイル名 [PNG]」のように表示されます。
+すべての画像形式に対応しています。拡張子を含めたファイル名全体が「画像 mongol-cow.png」のように表示されます。
 
 == Changelog ==
+
+= 1.0.5 =
+* 拡張子を含めたファイル名全体を表示するように変更（括弧付き拡張子を削除）
+* 短縮ルールを変更: 18文字以上の場合に前後6文字 + 拡張子
+* 表示形式を「画像 ファイル名.拡張子」に変更
 
 = 1.0.4 =
 * WordPress 6.5+ の stripHTML() によるファイル名消失問題を修正

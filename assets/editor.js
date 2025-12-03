@@ -2,9 +2,9 @@
 	const { addFilter } = wp.hooks;
 
 	/**
-	 * URL からファイル名（拡張子除く）を取得
+	 * URL からファイル名（拡張子含む）を取得
 	 * @param {string} url - 画像URL
-	 * @return {string} ファイル名（拡張子除く）
+	 * @return {string} ファイル名（拡張子含む）
 	 */
 	function getFileNameFromUrl(url) {
 		if (typeof url !== 'string' || !url) {
@@ -15,23 +15,14 @@
 		const parts = url.split('/');
 		const fileName = parts[parts.length - 1];
 
-		// クエリパラメータを除去
-		const fileNameWithoutQuery = fileName.split('?')[0];
-
-		// 拡張子を除去
-		const dotIndex = fileNameWithoutQuery.lastIndexOf('.');
-		if (dotIndex > 0) {
-			return fileNameWithoutQuery.substring(0, dotIndex);
-		}
-
-		// 拡張子がない場合はそのまま返す
-		return fileNameWithoutQuery;
+		// クエリパラメータを除去して返す
+		return fileName.split('?')[0];
 	}
 
 	/**
-	 * URL から拡張子を取得
+	 * URL から拡張子を取得（ピリオド含む）
 	 * @param {string} url - 画像URL
-	 * @return {string} 拡張子（小文字、ピリオドなし）
+	 * @return {string} 拡張子（ピリオド含む、例: ".jpg"）
 	 */
 	function getExtensionFromUrl(url) {
 		if (typeof url !== 'string' || !url) {
@@ -45,29 +36,49 @@
 		// クエリパラメータを除去
 		const fileNameWithoutQuery = fileName.split('?')[0];
 
-		// 最後の . 以降を取得
+		// 最後の . 以降を取得（ピリオド含む）
 		const dotIndex = fileNameWithoutQuery.lastIndexOf('.');
 		if (dotIndex > 0 && dotIndex < fileNameWithoutQuery.length - 1) {
-			return fileNameWithoutQuery.substring(dotIndex + 1).toLowerCase();
+			return fileNameWithoutQuery.substring(dotIndex);
 		}
 
 		return '';
 	}
 
 	/**
-	 * 13文字以上なら短縮（先頭6 + "..." + 末尾6）
-	 * @param {string} str - 対象文字列
-	 * @return {string} 短縮後の文字列
+	 * 18文字以上なら短縮（先頭6 + "..." + 末尾6 + 拡張子）
+	 * @param {string} fileName - ファイル名（拡張子含む）
+	 * @param {string} ext - 拡張子（ピリオド含む）
+	 * @return {string} 短縮後のファイル名
 	 */
-	function truncateFileName(str) {
-		if (!str || str.length <= 12) return str;
-		return str.slice(0, 6) + '...' + str.slice(-6);
+	function truncateFileName(fileName, ext) {
+		if (!fileName) return '';
+
+		// 拡張子がない場合は単純な短縮
+		if (!ext) {
+			if (fileName.length <= 17) return fileName;
+			return fileName.slice(0, 6) + '...' + fileName.slice(-6);
+		}
+
+		// 拡張子を除いた部分の長さをチェック
+		const nameWithoutExt = fileName.substring(0, fileName.length - ext.length);
+		const totalLength = fileName.length;
+
+		// 18文字以上なら短縮（拡張子は必ず残す）
+		if (totalLength <= 17) {
+			return fileName;
+		}
+
+		// 先頭6文字 + "..." + 末尾6文字（拡張子除く） + 拡張子
+		const start = nameWithoutExt.slice(0, 6);
+		const end = nameWithoutExt.slice(-6);
+		return start + '...' + end + ext;
 	}
 
 	/**
 	 * attributes から表示名を安全に取得
 	 * @param {Object} attributes - ブロック属性
-	 * @return {string} 表示名（alt または ファイル名）
+	 * @return {string} 表示名（alt または ファイル名（拡張子含む））
 	 */
 	function buildLabel(attributes) {
 		if (!attributes) {
@@ -80,7 +91,7 @@
 			return alt;
 		}
 
-		// alt が空なら URL からファイル名取得
+		// alt が空なら URL からファイル名取得（拡張子含む）
 		const url = typeof attributes.url === 'string' ? attributes.url : '';
 		return getFileNameFromUrl(url);
 	}
@@ -101,22 +112,17 @@
 			return '';
 		}
 
-		// 13文字以上なら短縮
-		const truncated = truncateFileName(displayName);
-		console.log('[andW ImageNameLabel] truncated:', truncated);
-
-		// 拡張子を取得
+		// 拡張子を取得（ピリオド含む）
 		const url = (attributes && attributes.url) || '';
 		const ext = getExtensionFromUrl(url);
 		console.log('[andW ImageNameLabel] extension:', ext);
 
-		// 「画像 ファイル名 [拡張子]」形式で返す（山括弧を使わない）
-		// WordPress 6.5+ の stripHTML() で削除されないようプレーンテキストのみ使用
-		const parts = ['画像', truncated];
-		if (ext) {
-			parts.push('[' + ext.toUpperCase() + ']');
-		}
-		const finalLabel = parts.join(' ');
+		// 18文字以上なら短縮（拡張子は必ず残す）
+		const truncated = truncateFileName(displayName, ext);
+		console.log('[andW ImageNameLabel] truncated:', truncated);
+
+		// 「画像 ファイル名.拡張子」形式で返す
+		const finalLabel = '画像 ' + truncated;
 		console.log('[andW ImageNameLabel] final label:', finalLabel);
 
 		return finalLabel;
