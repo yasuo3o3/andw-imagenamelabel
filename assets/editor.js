@@ -77,24 +77,24 @@
 	}
 
 	/**
-	 * attributes から表示名を安全に取得
+	 * attributes から表示名とタイプを安全に取得
 	 * @param {Object} attributes - ブロック属性
-	 * @return {string} 表示名（alt または ファイル名（拡張子含む））
+	 * @return {Object} { name: 表示名, isAlt: alt かどうか }
 	 */
 	function buildLabel(attributes) {
 		if (!attributes) {
-			return '';
+			return { name: '', isAlt: false };
 		}
 
-		// alt があれば alt を使用
+		// alt があれば alt を使用（短縮・拡張子付与なし）
 		const alt = typeof attributes.alt === 'string' ? attributes.alt.trim() : '';
 		if (alt) {
-			return alt;
+			return { name: alt, isAlt: true };
 		}
 
 		// alt が空なら URL からファイル名取得（拡張子含む）
 		const url = typeof attributes.url === 'string' ? attributes.url : '';
-		return getFileNameFromUrl(url);
+		return { name: getFileNameFromUrl(url), isAlt: false };
 	}
 
 	/**
@@ -103,30 +103,36 @@
 	 * @return {string} 生成されたラベル（空の場合は空文字列）
 	 */
 	function generateLabel(attributes) {
-		const displayName = buildLabel(attributes);
+		const labelData = buildLabel(attributes);
 
-		if (!displayName) {
+		if (!labelData.name) {
 			return '';
 		}
 
-		// 拡張子を取得（ピリオド含む）
-		const url = (attributes && attributes.url) || '';
-		const ext = getExtensionFromUrl(url);
+		let displayText;
 
-		// 18文字以上なら短縮（拡張子は必ず残す）
-		const truncated = truncateFileName(displayName, ext);
+		if (labelData.isAlt) {
+			// alt の場合は短縮も拡張子付与もしない
+			displayText = labelData.name;
+		} else {
+			// ファイル名の場合は拡張子を取得して短縮処理
+			const url = (attributes && attributes.url) || '';
+			const ext = getExtensionFromUrl(url);
 
-		// 「画像 ファイル名.拡張子」形式で返す
-		// translators: %s はファイル名（拡張子含む）
-		const finalLabel = sprintf(__('画像 %s', 'andw-imagenamelabel'), truncated);
+			// 18文字以上なら短縮（拡張子は必ず残す）
+			displayText = truncateFileName(labelData.name, ext);
+		}
+
+		// 「画像 表示名」形式で返す
+		// translators: %s はファイル名（拡張子含む）または alt テキスト
+		const finalLabel = sprintf(__('画像 %s', 'andw-imagenamelabel'), displayText);
 
 		return finalLabel;
 	}
 
 	/**
 	 * blocks.getBlockLabel フィルター
-	 * 注意: WordPress 6.3+ では List View で機能しないため、
-	 * __experimentalLabel も併用する必要があります
+	 * WordPress 6.0+ で使用可能な安定 API
 	 */
 	addFilter(
 		'blocks.getBlockLabel',
@@ -140,48 +146,4 @@
 			return customLabel || label;
 		}
 	);
-
-	/**
-	 * blocks.registerBlockType フィルター
-	 * 注意: __experimentalLabel は実験的 API ですが、WordPress 6.3+ の List View では
-	 * これが唯一の方法です。WordPress コアが安定 API を提供するまでの暫定対応です。
-	 */
-	if (typeof wp !== 'undefined' && wp.hooks) {
-		addFilter(
-			'blocks.registerBlockType',
-			'andw-imagenamelabel/add-label',
-			function(settings, name) {
-				if (name !== 'core/image') {
-					return settings;
-				}
-
-				const originalLabel = settings.__experimentalLabel;
-
-				return Object.assign({}, settings, {
-					__experimentalLabel: function(attributes, context) {
-						// context 形式の汎用判定
-						const contextName =
-							typeof context === 'string'
-								? context
-								: (context && (context.context || context.name)) || '';
-
-						if (contextName !== 'list-view') {
-							return originalLabel
-								? originalLabel(attributes, context)
-								: settings.title || 'Image';
-						}
-
-						const label = generateLabel(attributes);
-						if (!label) {
-							return originalLabel
-								? originalLabel(attributes, context)
-								: settings.title || 'Image';
-						}
-
-						return label;
-					}
-				});
-			}
-		);
-	}
 })();

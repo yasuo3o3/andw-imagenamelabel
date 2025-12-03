@@ -74,6 +74,13 @@ WordPress 6.0 以降で動作します。WordPress 6.9 まで動作確認済み�
 
 ## 変更履歴
 
+### 1.0.7
+- **[Major] __experimentalLabel の使用を削除**: WordPress.org 規約準拠
+- **[Major] blocks.getBlockLabel のみを使用**: 安定 API 実装に変更
+- **[Major] alt テキストの短縮・拡張子付与問題を修正**: alt はそのまま表示
+- **[Minor] languages フォルダと翻訳ファイルを追加**: POT, PO, JSON
+- **[Info] WordPress 6.3+ の List View で動作しない可能性**: 安定 API 使用のため
+
 ### 1.0.6
 - **[Major] 国際化対応**: wp.i18n の翻訳関数を使用
 - **[Major] wp_set_script_translations を追加**: JavaScript の翻訳をサポート
