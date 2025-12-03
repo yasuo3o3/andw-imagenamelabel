@@ -4,7 +4,7 @@ Tags: block editor, image, list view, gutenberg
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,14 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 すべての画像形式に対応しています。拡張子を含めたファイル名全体が「画像 mongol-cow.png」のように表示されます。
 
 == Changelog ==
+
+= 1.0.6 =
+* [Major] 国際化対応: wp.i18n の翻訳関数を使用
+* [Major] wp_set_script_translations を追加して JavaScript の翻訳をサポート
+* [Major] wp-i18n を依存関係に追加
+* [Minor] デバッグログ（console.log）を削除
+* [Minor] 未使用の editor.css を削除
+* [Info] __experimentalLabel の使用について説明を追加（WordPress 6.3+ の List View では必須）
 
 = 1.0.5 =
 * 拡張子を含めたファイル名全体を表示するように変更（括弧付き拡張子を削除）

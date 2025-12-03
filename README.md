@@ -74,6 +74,14 @@ WordPress 6.0 以降で動作します。WordPress 6.9 まで動作確認済み�
 
 ## 変更履歴
 
+### 1.0.6
+- **[Major] 国際化対応**: wp.i18n の翻訳関数を使用
+- **[Major] wp_set_script_translations を追加**: JavaScript の翻訳をサポート
+- **[Major] wp-i18n を依存関係に追加**
+- **[Minor] デバッグログ削除**: console.log を削除
+- **[Minor] 未使用ファイル削除**: editor.css を削除
+- **[Info] __experimentalLabel の使用について説明を追加**: WordPress 6.3+ の List View では必須
+
 ### 1.0.5
 - 拡張子を含めたファイル名全体を表示するように変更（括弧付き拡張子を削除）
 - 短縮ルールを変更: 18文字以上の場合に前後6文字 + 拡張子

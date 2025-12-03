@@ -1,5 +1,6 @@
 (function() {
 	const { addFilter } = wp.hooks;
+	const { sprintf, __ } = wp.i18n;
 
 	/**
 	 * URL からファイル名（拡張子含む）を取得
@@ -102,107 +103,85 @@
 	 * @return {string} 生成されたラベル（空の場合は空文字列）
 	 */
 	function generateLabel(attributes) {
-		console.log('[andW ImageNameLabel] generateLabel called', { attributes });
-
 		const displayName = buildLabel(attributes);
-		console.log('[andW ImageNameLabel] displayName:', displayName);
 
 		if (!displayName) {
-			console.log('[andW ImageNameLabel] displayName is empty, returning empty string');
 			return '';
 		}
 
 		// 拡張子を取得（ピリオド含む）
 		const url = (attributes && attributes.url) || '';
 		const ext = getExtensionFromUrl(url);
-		console.log('[andW ImageNameLabel] extension:', ext);
 
 		// 18文字以上なら短縮（拡張子は必ず残す）
 		const truncated = truncateFileName(displayName, ext);
-		console.log('[andW ImageNameLabel] truncated:', truncated);
 
 		// 「画像 ファイル名.拡張子」形式で返す
-		const finalLabel = '画像 ' + truncated;
-		console.log('[andW ImageNameLabel] final label:', finalLabel);
+		// translators: %s はファイル名（拡張子含む）
+		const finalLabel = sprintf(__('画像 %s', 'andw-imagenamelabel'), truncated);
 
 		return finalLabel;
 	}
 
 	/**
-	 * 1. blocks.registerBlockType フィルター（WP 6.3+ で動作）
-	 */
-	addFilter(
-		'blocks.registerBlockType',
-		'andw-imagenamelabel/add-label',
-		function(settings, name) {
-			console.log('[andW ImageNameLabel] registerBlockType filter called for:', name);
-
-			if (name !== 'core/image') {
-				return settings;
-			}
-
-			const originalLabel = settings.__experimentalLabel;
-			console.log('[andW ImageNameLabel] Original __experimentalLabel:', typeof originalLabel);
-
-			return Object.assign({}, settings, {
-				__experimentalLabel: function(attributes, context) {
-					console.log('[andW ImageNameLabel] __experimentalLabel called', { attributes, context });
-
-					// context 形式の汎用判定
-					// WP 6.0-6.3: { context: 'list-view' }（オブジェクト）
-					// WP 6.4-6.7: 'list-view'（文字列の場合もある）
-					// 古い Gutenberg: { name: 'list-view' }
-					const contextName =
-						typeof context === 'string'
-							? context
-							: (context && (context.context || context.name)) || '';
-
-					console.log('[andW ImageNameLabel] contextName:', contextName);
-
-					if (contextName !== 'list-view') {
-						// list-view 以外のコンテキストでは元のラベルを返す
-						console.log('[andW ImageNameLabel] Not list-view context, returning original');
-						return originalLabel
-							? originalLabel(attributes, context)
-							: settings.title || 'Image';
-					}
-
-					// カスタムラベル生成
-					const label = generateLabel(attributes);
-					if (!label) {
-						// ラベルが生成できない場合は元のラベルを返す
-						console.log('[andW ImageNameLabel] Label generation failed, returning original');
-						return originalLabel
-							? originalLabel(attributes, context)
-							: settings.title || 'Image';
-					}
-
-					console.log('[andW ImageNameLabel] Returning custom label:', label);
-					return label;
-				}
-			});
-		}
-	);
-
-	/**
-	 * 2. blocks.getBlockLabel フィルター（WP 6.0-6.2 互換性）
+	 * blocks.getBlockLabel フィルター
+	 * 注意: WordPress 6.3+ では List View で機能しないため、
+	 * __experimentalLabel も併用する必要があります
 	 */
 	addFilter(
 		'blocks.getBlockLabel',
 		'andw-imagenamelabel/get-block-label',
 		function(label, blockType, attributes) {
-			console.log('[andW ImageNameLabel] getBlockLabel called', { label, blockType, attributes });
-
 			if (!blockType || blockType.name !== 'core/image') {
 				return label;
 			}
 
-			console.log('[andW ImageNameLabel] getBlockLabel for core/image');
-
-			// カスタムラベル生成
 			const customLabel = generateLabel(attributes);
-			console.log('[andW ImageNameLabel] getBlockLabel returning:', customLabel || label);
 			return customLabel || label;
 		}
 	);
+
+	/**
+	 * blocks.registerBlockType フィルター
+	 * 注意: __experimentalLabel は実験的 API ですが、WordPress 6.3+ の List View では
+	 * これが唯一の方法です。WordPress コアが安定 API を提供するまでの暫定対応です。
+	 */
+	if (typeof wp !== 'undefined' && wp.hooks) {
+		addFilter(
+			'blocks.registerBlockType',
+			'andw-imagenamelabel/add-label',
+			function(settings, name) {
+				if (name !== 'core/image') {
+					return settings;
+				}
+
+				const originalLabel = settings.__experimentalLabel;
+
+				return Object.assign({}, settings, {
+					__experimentalLabel: function(attributes, context) {
+						// context 形式の汎用判定
+						const contextName =
+							typeof context === 'string'
+								? context
+								: (context && (context.context || context.name)) || '';
+
+						if (contextName !== 'list-view') {
+							return originalLabel
+								? originalLabel(attributes, context)
+								: settings.title || 'Image';
+						}
+
+						const label = generateLabel(attributes);
+						if (!label) {
+							return originalLabel
+								? originalLabel(attributes, context)
+								: settings.title || 'Image';
+						}
+
+						return label;
+					}
+				});
+			}
+		);
+	}
 })();
