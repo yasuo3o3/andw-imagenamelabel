@@ -1,8 +1,7 @@
 (function() {
 	const { addFilter } = wp.hooks;
 	const { sprintf, __ } = wp.i18n;
-	const { createElement } = wp.element;
-	const { MenuItem } = wp.components;
+	const data = wp.data;
 
 	/**
 	 * URL からファイル名（拡張子含む）を取得
@@ -79,9 +78,33 @@
 	}
 
 	/**
+	 * ブロック属性から URL を解決
+	 * @param {Object} attributes - ブロック属性
+	 * @return {string} URL
+	 */
+	function resolveUrl(attributes) {
+		if (attributes && typeof attributes.url === 'string' && attributes.url) {
+			return attributes.url;
+		}
+
+		if (
+			!attributes ||
+			typeof attributes.id !== 'number' ||
+			!wp ||
+			!data ||
+			typeof data.select !== 'function'
+		) {
+			return '';
+		}
+
+		const media = data.select('core')?.getMedia(attributes.id);
+		return media?.source_url || '';
+	}
+
+	/**
 	 * attributes から表示名とタイプを安全に取得
 	 * @param {Object} attributes - ブロック属性
-	 * @return {Object} { name: 表示名, isAlt: alt かどうか }
+	 * @return {Object} { name: 表示名, isAlt: alt かどうか, url?: 取得元 URL }
 	 */
 	function buildLabel(attributes) {
 		if (!attributes) {
@@ -95,33 +118,19 @@
 		}
 
 		// alt が空なら URL からファイル名取得（拡張子含む）
-		const url = typeof attributes.url === 'string' ? attributes.url : '';
-		return { name: getFileNameFromUrl(url), isAlt: false };
+		const url = resolveUrl(attributes);
+		return { name: getFileNameFromUrl(url), isAlt: false, url };
 	}
 
 	/**
 	 * ラベル生成（共通ロジック）
 	 * @param {Object} attributes - ブロック属性
-	 * @param {Object} block - ブロック全体（フォールバック用・オプショナル）
 	 * @return {string} 生成されたラベル（空の場合は空文字列）
 	 */
-	function generateLabel(attributes, block) {
+	function generateLabel(attributes) {
 		const labelData = buildLabel(attributes);
 
 		if (!labelData.name) {
-			// フォールバック: block.originalContent や block 全体から情報を取得
-			if (block && block.originalContent) {
-				// originalContent から url を抽出してファイル名を取得
-				const urlMatch = block.originalContent.match(/src="([^"]+)"/);
-				if (urlMatch && urlMatch[1]) {
-					const fileName = getFileNameFromUrl(urlMatch[1]);
-					if (fileName) {
-						const ext = getExtensionFromUrl(urlMatch[1]);
-						const displayText = truncateFileName(fileName, ext);
-						return sprintf(__('画像 %s', 'andw-imagenamelabel'), displayText);
-					}
-				}
-			}
 			return '';
 		}
 
@@ -131,8 +140,8 @@
 			// alt の場合は短縮も拡張子付与もしない
 			displayText = labelData.name;
 		} else {
-			// ファイル名の場合は拡張子を取得して短縮処理
-			const url = (attributes && attributes.url) || '';
+			// ファイル名の場合は URL を解決して拡張子を取得し短縮
+			const url = labelData.url || resolveUrl(attributes);
 			const ext = getExtensionFromUrl(url);
 
 			// 18文字以上なら短縮（拡張子は必ず残す）
@@ -164,43 +173,5 @@
 		}
 	);
 
-	/**
-	 * editor.BlockNavigationBlock フィルター
-	 * WordPress 6.3+ の List View 専用
-	 * MenuItem を直接描画してカスタムラベルを表示
-	 */
-	addFilter(
-		'editor.BlockNavigationBlock',
-		'andw-imagenamelabel/list-view-label',
-		function(BlockNavigationBlock) {
-			return function(props) {
-				// core/image 以外はそのまま返す
-				if (props.block?.name !== 'core/image') {
-					return createElement(BlockNavigationBlock, props);
-				}
-
-				// props.block.attributes から直接ラベルを生成
-				// フォールバックとして block 全体も渡す
-				const customLabel = generateLabel(props.block.attributes || {}, props.block);
-
-				// ラベルが生成できない場合はデフォルト
-				if (!customLabel) {
-					return createElement(BlockNavigationBlock, props);
-				}
-
-				// MenuItem を直接描画してカスタムラベルを表示
-				// これにより BlockNavigationBlock の内部処理をバイパス
-				return createElement(
-					MenuItem,
-					{
-						className: props.className,
-						onClick: props.onClick,
-						role: 'menuitem',
-						'aria-label': customLabel
-					},
-					customLabel
-				);
-			};
-		}
-	);
+	// List View も含めて blocks.getBlockLabel の結果を使用するため追加フックは不要
 })();
