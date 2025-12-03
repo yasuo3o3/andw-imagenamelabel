@@ -7,7 +7,9 @@
 	 * @return {string} ファイル名（拡張子除く）
 	 */
 	function getFileNameFromUrl(url) {
-		if (!url || typeof url !== 'string') return '';
+		if (typeof url !== 'string' || !url) {
+			return '';
+		}
 
 		// URL から最後の / 以降を取得
 		const parts = url.split('/');
@@ -32,7 +34,9 @@
 	 * @return {string} 拡張子（小文字、ピリオドなし）
 	 */
 	function getExtensionFromUrl(url) {
-		if (!url || typeof url !== 'string') return '';
+		if (typeof url !== 'string' || !url) {
+			return '';
+		}
 
 		// URL から最後の / 以降を取得
 		const parts = url.split('/');
@@ -61,7 +65,53 @@
 	}
 
 	/**
-	 * core/image ブロックに __experimentalLabel を追加
+	 * attributes から表示名を安全に取得
+	 * @param {Object} attributes - ブロック属性
+	 * @return {string} 表示名（alt または ファイル名）
+	 */
+	function buildLabel(attributes) {
+		if (!attributes) {
+			return '';
+		}
+
+		// alt があれば alt を使用
+		const alt = typeof attributes.alt === 'string' ? attributes.alt.trim() : '';
+		if (alt) {
+			return alt;
+		}
+
+		// alt が空なら URL からファイル名取得
+		const url = typeof attributes.url === 'string' ? attributes.url : '';
+		return getFileNameFromUrl(url);
+	}
+
+	/**
+	 * ラベル生成（共通ロジック）
+	 * @param {Object} attributes - ブロック属性
+	 * @return {string} 生成されたラベル（空の場合は空文字列）
+	 */
+	function generateLabel(attributes) {
+		const displayName = buildLabel(attributes);
+		if (!displayName) {
+			return '';
+		}
+
+		// 13文字以上なら短縮
+		const truncated = truncateFileName(displayName);
+
+		// 拡張子を取得
+		const url = (attributes && attributes.url) || '';
+		const ext = getExtensionFromUrl(url);
+
+		// 「画像 <名前> [ 拡張子 ]」形式で返す
+		if (ext) {
+			return '画像 <' + truncated + '> [ ' + ext.toUpperCase() + ' ]';
+		}
+		return '画像 <' + truncated + '>';
+	}
+
+	/**
+	 * 1. blocks.registerBlockType フィルター（WP 6.3+ で動作）
 	 */
 	addFilter(
 		'blocks.registerBlockType',
@@ -71,59 +121,55 @@
 				return settings;
 			}
 
+			const originalLabel = settings.__experimentalLabel;
+
 			return Object.assign({}, settings, {
 				__experimentalLabel: function(attributes, context) {
-					console.log('[DEBUG] __experimentalLabel called');
-					console.log('[DEBUG] context:', context);
-					console.log('[DEBUG] attributes:', attributes);
+					// context 形式の汎用判定
+					// WP 6.0-6.3: { context: 'list-view' }（オブジェクト）
+					// WP 6.4-6.7: 'list-view'（文字列の場合もある）
+					// 古い Gutenberg: { name: 'list-view' }
+					const contextName =
+						typeof context === 'string'
+							? context
+							: (context && (context.context || context.name)) || '';
 
-					// list-view コンテキストの場合のみカスタムラベルを返す
-					if (context && context.context === 'list-view') {
-						console.log('[DEBUG] list-view context detected');
-						let displayName = '';
-						let ext = '';
-
-						// 1. alt があれば alt を使用
-						if (attributes.alt && typeof attributes.alt === 'string' && attributes.alt.trim() !== '') {
-							displayName = attributes.alt.trim();
-							if (attributes.url) {
-								ext = getExtensionFromUrl(attributes.url);
-							}
-							console.log('[DEBUG] Using alt:', displayName, 'ext:', ext);
-						}
-						// 2. alt が空なら URL からファイル名取得
-						else if (attributes.url && typeof attributes.url === 'string') {
-							displayName = getFileNameFromUrl(attributes.url);
-							ext = getExtensionFromUrl(attributes.url);
-							console.log('[DEBUG] Using filename:', displayName, 'ext:', ext);
-						}
-
-						// ファイル名が取得できない場合はデフォルトラベルを返す
-						if (!displayName) {
-							console.log('[DEBUG] No displayName, returning default');
-							return settings.title || 'Image';
-						}
-
-						// 3. 13文字以上なら短縮（前6...後6）
-						displayName = truncateFileName(displayName);
-						console.log('[DEBUG] After truncate:', displayName);
-
-						// 4. 「画像 <名前> [ 拡張子 ]」形式で返す
-						let finalLabel;
-						if (ext) {
-							finalLabel = '画像 <' + displayName + '> [ ' + ext.toUpperCase() + ' ]';
-						} else {
-							finalLabel = '画像 <' + displayName + '>';
-						}
-						console.log('[DEBUG] Final label:', finalLabel);
-						return finalLabel;
+					if (contextName !== 'list-view') {
+						// list-view 以外のコンテキストでは元のラベルを返す
+						return originalLabel
+							? originalLabel(attributes, context)
+							: settings.title || 'Image';
 					}
 
-					console.log('[DEBUG] Not list-view context, returning default');
-					// その他のコンテキストではデフォルトのタイトルを返す
-					return settings.title || 'Image';
+					// カスタムラベル生成
+					const label = generateLabel(attributes);
+					if (!label) {
+						// ラベルが生成できない場合は元のラベルを返す
+						return originalLabel
+							? originalLabel(attributes, context)
+							: settings.title || 'Image';
+					}
+
+					return label;
 				}
 			});
+		}
+	);
+
+	/**
+	 * 2. blocks.getBlockLabel フィルター（WP 6.0-6.2 互換性）
+	 */
+	addFilter(
+		'blocks.getBlockLabel',
+		'andw-imagenamelabel/get-block-label',
+		function(label, blockType, attributes) {
+			if (!blockType || blockType.name !== 'core/image') {
+				return label;
+			}
+
+			// カスタムラベル生成
+			const customLabel = generateLabel(attributes);
+			return customLabel || label;
 		}
 	);
 })();

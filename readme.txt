@@ -4,7 +4,7 @@ Tags: block editor, image, list view, gutenberg
 Requires at least: 6.0
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.0
+Stable tag: 1.0.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,6 +44,15 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 すべての画像形式に対応しています。拡張子は大文字で「画像 <ファイル名> [ PNG ]」のように表示されます。
 
 == Changelog ==
+
+= 1.0.2 =
+* attributes が undefined のケースに対応（メディア未選択時やLazy Load中のエラーを修正）
+* context 形式の判定を汎用化（文字列/オブジェクト両対応、WordPress 6.0-6.7 全バージョンで動作）
+* blocks.getBlockLabel フィルターを追加（WordPress 6.0-6.2 互換性向上）
+* buildLabel / generateLabel 関数を追加してコード構造を改善
+
+= 1.0.1 =
+* デバッグログを追加（問題調査用）
 
 = 1.0.0 =
 * 初回安定版リリース
