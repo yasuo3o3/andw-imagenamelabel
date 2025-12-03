@@ -81,6 +81,12 @@
 			const ext = getExtensionFromUrl(url);
 			displayText = truncateFileName(labelData.name, ext);
 		}
+
+		// 画像IDを追加（重複ファイル名の識別用）
+		if (attributes && attributes.id) {
+			displayText = displayText + ' (#' + attributes.id + ')';
+		}
+
 		return sprintf(__('Image %s', 'andw-imagenamelabel'), displayText);
 	}
 
