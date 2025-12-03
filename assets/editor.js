@@ -81,7 +81,7 @@
 			const ext = getExtensionFromUrl(url);
 			displayText = truncateFileName(labelData.name, ext);
 		}
-		return sprintf(__('画像 %s', 'andw-imagenamelabel'), displayText);
+		return sprintf(__('Image %s', 'andw-imagenamelabel'), displayText);
 	}
 
 	/**
@@ -106,7 +106,7 @@
 						if (typeof originalLabel === 'function') {
 							return originalLabel(attributes, context);
 						}
-						return settings.title || 'Image';
+						return settings.title || __('Image', 'andw-imagenamelabel');
 					}
 
 					// list-view ではカスタムラベルを生成
@@ -119,7 +119,7 @@
 					if (typeof originalLabel === 'function') {
 						return originalLabel(attributes, context);
 					}
-					return settings.title || 'Image';
+					return settings.title || __('Image', 'andw-imagenamelabel');
 				}
 			};
 		}

@@ -9,8 +9,11 @@
         "lang": "ja",
         "plural-forms": "nplurals=1; plural=0;"
       },
-      "画像 %s": [
+      "Image %s": [
         "画像 %s"
+      ],
+      "Image": [
+        "画像"
       ]
     }
   }

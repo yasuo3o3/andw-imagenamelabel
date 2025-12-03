@@ -8,9 +8,28 @@ Stable tag: 1.0.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-ブロックエディタのリストビューで core/image ブロックのラベルを画像名で差し替える。
+Displays image filenames or alt text in the block editor's List View for core/image blocks.
 
 == Description ==
+
+This plugin replaces the label of core/image blocks in the block editor's List View with the image's alt text or filename.
+
+**Key Features:**
+
+* Displays alt text if available
+* Shows filename (including extension) from URL when alt is empty
+* Automatically truncates long filenames (18+ characters): first 6 + "..." + last 6 + extension
+* Display format: "Image filename.ext" (plain text only)
+
+**Characteristics:**
+
+* Lightweight implementation without build process (PHP + vanilla JavaScript)
+* Works only in editor (no frontend impact)
+* Follows WordPress Coding Standards
+
+---
+
+**日本語説明**
 
 ブロックエディタのリストビューにおいて、core/image ブロックのラベルを画像の alt テキストまたはファイル名で差し替えます。
 
@@ -29,11 +48,29 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
 == Installation ==
 
+1. Upload the plugin files to the `/wp-content/plugins/andw-imagenamelabel/` directory
+2. Activate the plugin through the 'Plugins' menu in WordPress
+3. Open the List View in the block editor and confirm that image block labels have changed
+
+**日本語:**
+
 1. プラグインファイルを `/wp-content/plugins/andw-imagenamelabel/` ディレクトリにアップロード
 2. WordPress の「プラグイン」メニューからプラグインを有効化
 3. ブロックエディタでリストビューを開き、画像ブロックのラベルが変更されていることを確認
 
 == Frequently Asked Questions ==
+
+= Does this affect the frontend? =
+
+No, this plugin only works in the editor and has no impact on the frontend.
+
+= What image formats are supported? =
+
+All image formats are supported. The entire filename including extension is displayed like "Image mongol-cow.png".
+
+---
+
+**日本語 FAQ**
 
 = フロントエンドに影響はありますか？ =
 
