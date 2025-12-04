@@ -32,21 +32,21 @@
 	}
 
 	/**
-	 * 18文字以上なら短縮（先頭6 + "..." + 末尾6 + 拡張子）
+	 * 18文字以上なら短縮（先頭3 + "..." + 末尾8 + 拡張子）
 	 */
 	function truncateFileName(fileName, ext) {
 		if (!fileName) return '';
 		if (!ext) {
 			if (fileName.length <= 17) return fileName;
-			return fileName.slice(0, 6) + '...' + fileName.slice(-6);
+			return fileName.slice(0, 3) + '...' + fileName.slice(-8);
 		}
 		const nameWithoutExt = fileName.substring(0, fileName.length - ext.length);
 		const totalLength = fileName.length;
 		if (totalLength <= 17) {
 			return fileName;
 		}
-		const start = nameWithoutExt.slice(0, 6);
-		const end = nameWithoutExt.slice(-6);
+		const start = nameWithoutExt.slice(0, 3);
+		const end = nameWithoutExt.slice(-8);
 		return start + '...' + end + ext;
 	}
 
@@ -84,7 +84,7 @@
 
 		// 画像IDを追加（重複ファイル名の識別用）
 		if (attributes && attributes.id) {
-			displayText = displayText + ' (#' + attributes.id + ')';
+			displayText = displayText + ' #' + attributes.id;
 		}
 
 		return sprintf(__('Image %s', 'andw-imagenamelabel'), displayText);
