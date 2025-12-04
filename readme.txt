@@ -4,7 +4,7 @@ Tags: block editor, image, list view, gutenberg
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.0.8
+Stable tag: 1.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -18,8 +18,9 @@ This plugin replaces the label of core/image blocks in the block editor's List V
 
 * Displays alt text if available
 * Shows filename (including extension) from URL when alt is empty
-* Automatically truncates long filenames (18+ characters): first 6 + "..." + last 6 + extension
-* Display format: "Image filename.ext" (plain text only)
+* Automatically truncates long filenames (18+ characters): first 3 + "..." + last 8 + extension
+* Adds image ID for duplicate filename identification
+* Display format: "Image filename.ext #123" (plain text only)
 
 **Characteristics:**
 
@@ -37,8 +38,9 @@ This plugin replaces the label of core/image blocks in the block editor's List V
 
 * alt テキストが設定されている場合は alt を表示
 * alt が空の場合は URL からファイル名（拡張子含む）を取得して表示
-* 18文字以上のファイル名は自動で短縮（先頭6文字 + "..." + 末尾6文字 + 拡張子）
-* 表示形式: 「画像 ファイル名.拡張子」（プレーンテキストのみ）
+* 18文字以上のファイル名は自動で短縮（先頭3文字 + "..." + 末尾8文字 + 拡張子）
+* 重複ファイル名の識別のため画像IDを表示
+* 表示形式: 「画像 ファイル名.拡張子 #123」（プレーンテキストのみ）
 
 **特徴:**
 
@@ -81,6 +83,16 @@ All image formats are supported. The entire filename including extension is disp
 すべての画像形式に対応しています。拡張子を含めたファイル名全体が「画像 mongol-cow.png」のように表示されます。
 
 == Changelog ==
+
+= 1.1.0 =
+* [Added] 画像ID表示機能を追加（重複ファイル名の識別を改善）
+* [Added] リストビュー画像サムネイルサイズを26pxに拡大
+* [Changed] ファイル名短縮ルールを変更（先頭3文字+末尾8文字に最適化）
+* [Changed] 画像ID表示形式を変更（括弧を削除してシンプルに）
+* [Changed] 英語ベースの翻訳システムに変更（国際化対応）
+* [Added] uninstall.php を追加（WordPress.org 審査対応）
+* [Added] Plugin URI を追加
+* [Fixed] 翻訳JSONファイルのドメインを修正
 
 = 1.0.8 =
 * [Major] editor.BlockNavigationBlock フィルターを追加（WordPress 6.3+ の List View 対応）

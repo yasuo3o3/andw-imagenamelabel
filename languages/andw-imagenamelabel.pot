@@ -2,7 +2,7 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: andW ImageNameLabel 1.0.8\n"
+"Project-Id-Version: andW ImageNameLabel 1.1.0\n"
 "Report-Msgid-Bugs-To: https://github.com/yasuo3o3/andw-imagenamelabel/issues\n"
 "POT-Creation-Date: 2025-01-15 00:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"

@@ -74,6 +74,16 @@ WordPress 6.0 以降で動作します。WordPress 6.9 まで動作確認済み�
 
 ## 変更履歴
 
+### 1.1.0
+- **[Added] 画像ID表示機能を追加**: 重複ファイル名の識別を改善
+- **[Added] リストビュー画像サムネイルサイズを26pxに拡大**: 視認性を向上
+- **[Changed] ファイル名短縮ルールを変更**: 先頭3文字+末尾8文字に最適化
+- **[Changed] 画像ID表示形式を変更**: 括弧を削除してシンプルに
+- **[Changed] 英語ベースの翻訳システムに変更**: 国際化対応を改善
+- **[Added] uninstall.php を追加**: WordPress.org 審査対応
+- **[Added] Plugin URI を追加**: プラグインヘッダーを完全化
+- **[Fixed] 翻訳JSONファイルのドメインを修正**: 翻訳が正しく読み込まれるように
+
 ### 1.0.8
 - **[Major] editor.BlockNavigationBlock フィルターを追加**: WordPress 6.3+ の List View 対応
 - **[Major] WordPress.org 規約に準拠**: 全バージョン（6.0-6.9）対応を実現
