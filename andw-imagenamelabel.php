@@ -31,6 +31,14 @@ function andw_imagenamelabel_enqueue_editor_assets() {
 		true
 	);
 
+	// エディタ用CSS
+	wp_enqueue_style(
+		'andw-imagenamelabel-editor',
+		plugin_dir_url( __FILE__ ) . 'assets/editor.css',
+		array(),
+		'1.0.8'
+	);
+
 	// スクリプトの翻訳設定
 	wp_set_script_translations(
 		'andw-imagenamelabel-editor',

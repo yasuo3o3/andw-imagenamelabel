@@ -1,0 +1,8 @@
+/**
+ * リストビュー画像サムネイルサイズ調整
+ * WordPress コアのデフォルト 18px を 26px に拡大
+ */
+.block-editor-list-view-leaf .block-editor-list-view-block-select-button__image {
+	height: 26px !important;
+	width: 26px !important;
+}
